@@ -1,0 +1,81 @@
+import sqlite3
+import os
+import datetime
+import socket
+from urllib.parse import urlparse
+import shutil
+
+# 第一版
+
+def get_chrome_history(history_path):
+    # 连接到Chrome历史记录数据库副本
+    conn = sqlite3.connect(history_path)
+    cursor = conn.cursor()
+
+    # 查询URL和访问时间
+    query = """
+    SELECT urls.url, urls.title, visits.visit_time
+    FROM visits
+    JOIN urls ON visits.url = urls.id
+    ORDER BY visits.visit_time DESC
+    """
+    cursor.execute(query)
+
+    # 提取查询结果
+    results = cursor.fetchall()
+
+    # 关闭数据库连接
+    conn.close()
+
+    # 将时间戳转换为可读格式
+    history = []
+    for url, title, visit_time in results:
+        # Chrome stores visit_time as the number of microseconds since Jan 1, 1601
+        visit_time = datetime.datetime(1601, 1, 1) + datetime.timedelta(microseconds=visit_time)
+        history.append({'url': url, 'title': title, 'visit_time': visit_time})
+
+    return history
+
+
+def get_ip_from_url(url):
+    try:
+        parsed_url = urlparse(url)
+        hostname = parsed_url.hostname
+        if hostname:
+            ip_address = socket.gethostbyname(hostname)
+            return ip_address
+    except Exception as e:
+        print(f"Error getting IP for URL {url}: {e}")
+    return None
+
+
+def main():
+    # Windows 11 Chrome历史记录文件路径
+    original_history_path = r'C:\Users\m1550\AppData\Local\Google\Chrome\User Data\Default\History'
+    temp_history_path = r'C:\Users\m1550\AppData\Local\Google\Chrome\User Data\Default\History_copy'
+
+    # 检查文件是否存在
+    if not os.path.exists(original_history_path):
+        print("Chrome history file not found.")
+        return
+
+    # 创建历史记录文件的副本
+    shutil.copy2(original_history_path, temp_history_path)
+
+    # 获取历史记录
+    history = get_chrome_history(temp_history_path)
+
+    # 删除副本文件
+    os.remove(temp_history_path)
+
+    # 打印历史记录及对应的IP地址
+    for entry in history:
+        ip_address = get_ip_from_url(entry['url'])
+        if ip_address:
+            print(f"Visited: {entry['visit_time']} | Title: {entry['title']} | URL: {entry['url']} | IP: {ip_address}")
+        else:
+            print(f"Visited: {entry['visit_time']} | Title: {entry['title']} | URL: {entry['url']} | IP: Not Found")
+
+
+if __name__ == "__main__":
+    main()
