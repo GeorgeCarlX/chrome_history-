@@ -6,6 +6,7 @@ Chrome 历史记录提取工具
 
 安装依赖
 确保安装了 Python 3 和以下依赖：
+
 pip install xlsxwriter
 
 使用方法
@@ -23,24 +24,34 @@ pip install xlsxwriter
 --city CITY: 指定城市用于筛选 IP 地理位置。
 
 示例
-1.创建包含所有历史记录的 Excel 文件：
-python main.py -c
+1.创建包含所有历史记录的 Excel 文件：  
+
+python main.py -c  
+
 这将从 Chrome 历史记录中提取所有记录，并保存到 chrome_history.xlsx 文件中。
 
 2.筛选特定日期范围的历史记录：
+
 python main.py -s -d 2024/01/01-2024/06/30
+
 这将筛选出从 2024 年 1 月 1 日到 2024 年 6 月 30 日的历史记录，并保存到 filtered_chrome_history.xlsx 文件中。
 
 3.根据关键词筛选历史记录：
+
 python main.py -s -k example
+
 这将筛选包含关键词 "example" 的 URL 的历史记录，并保存到 filtered_chrome_history.xlsx 文件中。
 
 4.根据目的 IP 地址筛选历史记录：
+
 python main.py -s --dip 192.168.1.1
+
 这将筛选出所有目标 IP 地址为 192.168.1.1 的历史记录，并保存到 filtered_chrome_history.xlsx 文件中。
 
 5.根据国家和城市筛选历史记录：
+
 python main.py -s --country China --city Beijing
+
 这将筛选出目的 IP 地址所在国家为 "China"，城市为 "Beijing" 的历史记录，并保存到 filtered_chrome_history.xlsx 文件中。
 
 注意事项
